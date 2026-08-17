@@ -14,8 +14,10 @@ private:
     static int counterId;
 
 public:
-    Person(string name, string password) : name(name), password(password)
+    Person(string name, string password)
     {
+        setName(name);
+        setPassword(password);
         status = true;
         counterId++;
         id = counterId;
@@ -48,12 +50,12 @@ public:
 
     void setStatus(bool status) { this->status = status; }
 
-    const int &getId() const { return id; }
+    int getId() const { return id; }
     const string &getName() const { return name; }
     const string &getPassword() const { return password; }
-    const bool getStatus() const { return status; }
+    bool getStatus() const { return status; }
 
-    virtual void dispalyInfo()
+    virtual void displayInfo() const
     {
         cout << "============================\n";
         cout << "Id is: " << id << endl;
@@ -61,7 +63,7 @@ public:
         cout << "Password is: " << password << endl;
     }
 
-    virtual bool statusActivtion() = 0;
+    virtual bool statusActivation() const = 0;
 };
 
 class Employee : public Person
@@ -70,7 +72,7 @@ private:
     double salary;
 
 public:
-    Employee(string name, string password, double salary) : Person(name, password), salary(salary) {}
+    Employee(string name, string password, double salary) : Person(name, password), salary(0) { setSalary(salary); }
 
     void setSalary(double salary)
     {
@@ -80,15 +82,15 @@ public:
             cout << "Salary must be at least 5000." << endl;
     }
 
-    const double &getSalary() const { return salary; }
+    double getSalary() const { return salary; }
 
-    void dispalyInfo() override
+    void displayInfo() const override
     {
-        Person::dispalyInfo();
+        Person::displayInfo();
         cout << "Salary is: " << salary << endl;
     }
 
-    bool statusActivtion() { return getStatus(); }
+    bool statusActivation() const override { return getStatus(); }
 };
 
 class Client : public Person
@@ -97,7 +99,7 @@ private:
     double balance;
 
 public:
-    Client(string name, string password, double balance) : Person(name, password), balance(balance) {}
+    Client(string name, string password, double balance) : Person(name, password), balance(0) { setBalance(balance); }
 
     void setBalance(double balance)
     {
@@ -107,51 +109,92 @@ public:
             cout << "Balance must be at least 1500." << endl;
     }
 
-    const double &getBalance() const { return balance; }
+    double getBalance() const { return balance; }
 
-    void dispalyInfo() override
+    void displayInfo() const override
     {
-        Person::dispalyInfo();
+        Person::displayInfo();
         cout << "Balance is: " << balance << endl;
     }
 
     void deposit(double amount)
     {
+        if (!getStatus())
+        {
+            cout << "Account is inactive." << endl;
+            return;
+        }
+
         if (amount > 0)
             balance += amount;
         else
-            cout << "Amount must be greater than zero." << endl;
+            cout << "Invalid deposit amount." << endl;
     }
 
     void withdraw(double amount)
     {
-        if (amount >= balance)
+        if (!getStatus())
+        {
+            cout << "Account is inactive." << endl;
+            return;
+        }
+
+        if (amount > 0 && amount <= balance)
             balance -= amount;
         else
-            cout << "Amount must be greater than Balance." << endl;
+            cout << "Invalid withdrawal amount." << endl;
     }
 
     void transferTo(double amount, Client &recipient)
     {
-        if (amount >= balance)
+        if (!getStatus())
+        {
+            cout << "Your account is inactive." << endl;
+            return;
+        }
+
+        if (!recipient.getStatus())
+        {
+            cout << "Recipient account is inactive." << endl;
+            return;
+        }
+
+        if (&recipient == this)
+        {
+            cout << "Cannot transfer to the same account." << endl;
+            return;
+        }
+
+        if (amount > 0 && amount <= balance)
         {
             balance -= amount;
             recipient.balance += amount;
         }
         else
-            cout << "Amount must be greater than Balance." << endl;
+        {
+            cout << "Invalid transfer amount." << endl;
+        }
     }
 
-    bool statusActivtion() { return getStatus(); }
+    bool statusActivation() const override { return getStatus(); }
 };
 
 int Person::counterId = 1000;
 
 int main()
 {
-    Employee m1("Zeyad Mohsen", "asdf1234", 3500);
-
+    Employee m1("Zeyad Mohsen", "asdf1234", 6000);
     Client c1("Abdulla Mohamed", "asdf1212", 6000);
+
+    Person *p1 = &m1;
+    Person *p2 = &c1;
+
+    p1->displayInfo();
+    p2->displayInfo();
+
+    cout << boolalpha;
+    cout << p1->statusActivation() << endl;
+    cout << p2->statusActivation() << endl;
 
     return 0;
 }
