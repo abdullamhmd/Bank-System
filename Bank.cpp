@@ -10,11 +10,13 @@ private:
     int id;
     string name;
     string password;
+    bool status;
     static int counterId;
 
 public:
     Person(string name, string password) : name(name), password(password)
     {
+        status = true;
         counterId++;
         id = counterId;
     }
@@ -44,9 +46,12 @@ public:
             cout << "Password length must be between 8 and 20 characters" << endl;
     }
 
+    void setStatus(bool status) { this->status = status; }
+
     const int &getId() const { return id; }
     const string &getName() const { return name; }
     const string &getPassword() const { return password; }
+    const bool getStatus() const { return status; }
 
     virtual void dispalyInfo()
     {
@@ -55,6 +60,8 @@ public:
         cout << "Name is: " << name << endl;
         cout << "Password is: " << password << endl;
     }
+
+    virtual bool statusActivtion() = 0;
 };
 
 class Employee : public Person
@@ -80,6 +87,8 @@ public:
         Person::dispalyInfo();
         cout << "Salary is: " << salary << endl;
     }
+
+    bool statusActivtion() { return getStatus(); }
 };
 
 class Client : public Person
@@ -132,17 +141,17 @@ public:
         else
             cout << "Amount must be greater than Balance." << endl;
     }
+
+    bool statusActivtion() { return getStatus(); }
 };
 
 int Person::counterId = 1000;
 
 int main()
 {
-    Person p1("Abdulla Mohamed", "asd123");
-    Person p2("Ahmed Adel", "asd123");
-    Person p3("Aya Aymen", "asd123");
-
     Employee m1("Zeyad Mohsen", "asdf1234", 3500);
+
+    Client c1("Abdulla Mohamed", "asdf1212", 6000);
 
     return 0;
 }
