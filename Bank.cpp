@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <cctype>
+#include <vector>
 #include <exception>
 using namespace std;
 
@@ -57,7 +58,6 @@ public:
 
     virtual void displayInfo() const
     {
-        cout << "============================\n";
         cout << "Id is: " << id << endl;
         cout << "Name is: " << name << endl;
         cout << "Password is: " << password << endl;
@@ -179,22 +179,114 @@ public:
     bool statusActivation() const override { return getStatus(); }
 };
 
+class Admin : public Person
+{
+private:
+    double balance;
+
+public:
+    Admin(string name, string password, double balance) : Person(name, password), balance(0)
+    {
+        setBalance(balance);
+    }
+
+    void setBalance(double balance)
+    {
+        if (balance >= 5000)
+            this->balance = balance;
+        else
+            cout << "Balance must be at least 5000." << endl;
+    }
+
+    double getBalance() const { return balance; }
+
+    void displayInfo() const override
+    {
+        Person::displayInfo();
+        cout << "Balance is: " << balance << endl;
+    }
+
+    bool statusActivation() const override { return getStatus(); }
+};
+
+class Bank
+{
+private:
+    vector<Employee> employees;
+    vector<Client> clients;
+    vector<Admin> admins;
+
+public:
+    void addEmployee(const Employee &employee)
+    {
+        employees.push_back(employee);
+    }
+
+    void addClient(const Client &client)
+    {
+        clients.push_back(client);
+    }
+
+    void addAdmin(const Admin &admin)
+    {
+        admins.push_back(admin);
+    }
+
+    void displayEmployees() const
+    {
+        for (const Employee &employee : employees)
+        {
+            employee.displayInfo();
+        }
+    }
+
+    void displayClients() const
+    {
+        for (const Client &client : clients)
+        {
+            client.displayInfo();
+        }
+    }
+
+    void displayAdmins() const
+    {
+        for (const Admin &admin : admins)
+        {
+            admin.displayInfo();
+        }
+    }
+};
+
 int Person::counterId = 1000;
 
 int main()
 {
-    Employee m1("Zeyad Mohsen", "asdf1234", 6000);
+    Employee e1("Zeyad Mohsen", "asdf1234", 6000);
+    Employee e2("Ahmed Ali", "ahmed123", 7000);
+
     Client c1("Abdulla Mohamed", "asdf1212", 6000);
+    Client c2("Mohamed Ali", "mohamed12", 3000);
 
-    Person *p1 = &m1;
-    Person *p2 = &c1;
+    Admin a1("Omar Hassan", "omar1234", 5000);
 
-    p1->displayInfo();
-    p2->displayInfo();
+    Bank bank;
 
-    cout << boolalpha;
-    cout << p1->statusActivation() << endl;
-    cout << p2->statusActivation() << endl;
+    bank.addEmployee(e1);
+    bank.addEmployee(e2);
+
+    bank.addClient(c1);
+    bank.addClient(c2);
+
+    bank.addAdmin(a1);
+
+    cout << "\n===== Employees =====\n";
+    bank.displayEmployees();
+
+    cout << "\n===== Clients =====\n";
+    bank.displayClients();
+
+    cout << "\n===== Admins =====\n";
+    bank.displayAdmins();
 
     return 0;
 }
