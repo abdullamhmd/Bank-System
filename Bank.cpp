@@ -58,12 +58,16 @@ public:
 
     virtual void displayInfo() const
     {
-        cout << "Id is: " << id << endl;
-        cout << "Name is: " << name << endl;
-        cout << "Password is: " << password << endl;
+        cout << "===== Personal Information =====" << endl;
+        cout << "ID        : " << id << endl;
+        cout << "Name      : " << name << endl;
+        cout << "Password  : " << password << endl;
+        cout << "Status    : " << (status ? "Active" : "Inactive") << endl;
     }
 
     virtual bool statusActivation() const = 0;
+
+    virtual ~Person() {}
 };
 
 class Employee : public Person
@@ -212,47 +216,16 @@ public:
 class Bank
 {
 private:
-    vector<Employee> employees;
-    vector<Client> clients;
-    vector<Admin> admins;
+    vector<Person *> person;
 
 public:
-    void addEmployee(const Employee &employee)
-    {
-        employees.push_back(employee);
-    }
+    void addPerson(Person *person) { this->person.push_back(person); }
 
-    void addClient(const Client &client)
+    void displayAll()
     {
-        clients.push_back(client);
-    }
-
-    void addAdmin(const Admin &admin)
-    {
-        admins.push_back(admin);
-    }
-
-    void displayEmployees() const
-    {
-        for (const Employee &employee : employees)
+        for (int i = 0; i < person.size(); i++)
         {
-            employee.displayInfo();
-        }
-    }
-
-    void displayClients() const
-    {
-        for (const Client &client : clients)
-        {
-            client.displayInfo();
-        }
-    }
-
-    void displayAdmins() const
-    {
-        for (const Admin &admin : admins)
-        {
-            admin.displayInfo();
+            person[i]->displayInfo();
         }
     }
 };
@@ -261,32 +234,26 @@ int Person::counterId = 1000;
 
 int main()
 {
-    Employee e1("Zeyad Mohsen", "asdf1234", 6000);
-    Employee e2("Ahmed Ali", "ahmed123", 7000);
-
-    Client c1("Abdulla Mohamed", "asdf1212", 6000);
-    Client c2("Mohamed Ali", "mohamed12", 3000);
-
-    Admin a1("Omar Hassan", "omar1234", 5000);
-
     Bank bank;
 
-    bank.addEmployee(e1);
-    bank.addEmployee(e2);
+    Person *ptr[] = {
+        new Employee("Zeyad Mohsen", "asdf1234", 6000),
+        new Employee("Ahmed Ali", "ahmed123", 7000),
+        new Client("Abdulla Mohamed", "asdf1212", 6000),
+        new Client("Mohamed Ali", "mohamed12", 3000),
+        new Admin("Omar Hassan", "omar1234", 5000)};
 
-    bank.addClient(c1);
-    bank.addClient(c2);
+    for (Person *p : ptr)
+    {
+        bank.addPerson(p);
+    }
 
-    bank.addAdmin(a1);
+    bank.displayAll();
 
-    cout << "\n===== Employees =====\n";
-    bank.displayEmployees();
-
-    cout << "\n===== Clients =====\n";
-    bank.displayClients();
-
-    cout << "\n===== Admins =====\n";
-    bank.displayAdmins();
+    for (Person *p : ptr)
+    {
+        delete p;
+    }
 
     return 0;
 }
